@@ -1,16 +1,47 @@
 #include <iostream>
+#include <map>
+
 using namespace std;
+
+enum Field {
+	wall = '#', chest = '0', target = '*', worker = '-', newline = '\n', empty = ' '
+};
+
+typedef map<tuple<size_t, size_t>, char> Board;
+
+Board &readBoard(size_t &width, size_t &height, Board &board);
 
 int main() {
 	size_t height = 0, width = 0;
-	char c;
-	cin >> height >> width;
-	cout << height << endl << width << endl;
+	map<tuple<size_t, size_t>, char> board;
+	readBoard(width, height, board);
 
-	while (cin) {
-		cin >> c;
-		cout << c;
-	}
-	cout << "Hello, World!" << std::endl;
+	for(auto & it : board)
+		cout << "(" << get<0>(it.first) << ", " << get<1>(it.first) << "): " << it.second << endl;
+
+	cout << board.size() << " " << width << " " << height;
+
 	return 0;
+}
+
+Board &readBoard(size_t &width, size_t &height, Board &board) {
+	char c;
+	size_t x = 0, y = 0;
+	cin >> height >> width;
+	cout << height << " " << width << endl;
+	cin.unsetf(ios_base::skipws);
+	while (cin && (x != width || y != height)) {
+		cin >> c;
+		if (c != empty && c != newline) {
+			board[make_tuple(x, y)] = c;
+		}
+		if (c == newline) {
+			x = 1;
+			++y;
+		} else {
+			++x;
+		}
+	}
+	cin.setf(ios_base::skipws);
+	return board;
 }
