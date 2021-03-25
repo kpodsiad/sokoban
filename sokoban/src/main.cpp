@@ -1,49 +1,43 @@
 #include <iostream>
-#include <map>
 #include <vector>
-
+#include <queue>
 #include <sokobanlib.h>
 
 using namespace std;
 
-Board &readBoard(size_t &width, size_t &height, Board &board)
-{
-    char c;
-    size_t x = 0, y = 0;
-    cin >> height >> width;
-    cout << height << " " << width << endl;
-    cin.unsetf(ios_base::skipws);
-    while (cin && (x != width || y != height))
-    {
-        cin >> c;
-        if (c != empty && c != newline)
-        {
-            board[make_tuple(x, y)] = c;
-        }
-        if (c == newline)
-        {
-            x = 1;
-            ++y;
-        }
-        else
-        {
-            ++x;
-        }
-    }
-    cin.setf(ios_base::skipws);
-    return board;
-}
+int main() {
+	size_t height = 0, width = 0;
+	Board startingBoard;
+	Point workerPosition;
+	queue<BoardState> states;
+	vector<Point> locations;
 
-int main()
-{
-    size_t height = 0, width = 0;
-    map<tuple<size_t, size_t>, char> board;
-    readBoard(width, height, board);
+	readBoard(width, height, startingBoard, cin, workerPosition, locations);
+	vector<ActionInfo> actions = {MOVE_UP, MOVE_RIGHT, MOVE_DOWN, MOVE_LEFT};
 
-    for (auto &it : board)
-        cout << "(" << get<0>(it.first) << ", " << get<1>(it.first) << "): " << it.second << endl;
+	states.push({startingBoard, workerPosition, ""});
+	while (!states.empty()) {
+		auto state = states.front();
+		Point workerPos = state.workerPos;
+		Board board = state.board;
+		if (isSolved(board, locations)) {
+			cout << state.history;
+		}
+		for (auto &action: actions) {
+			size_t x = workerPos.x, y = workerPos.y;
+			int dx = action.dx, dy = action.dy;
+			Point newPos = {x + dx, y + dy};
+			if (isPointInBoardRange(height, width, newPos)) {
+				if(board[x - dx][y - dy] == BOX) {
+					if(pull(x, y, dx, dy, board) /* todo add board history */) {
+						states.push({board, newPos, state.history + action.pullChar});
+					}
+				}
+			}
+		}
 
-    cout << board.size() << " " << width << " " << height;
+		states.pop();
+	}
 
-    return 0;
+	return 0;
 }

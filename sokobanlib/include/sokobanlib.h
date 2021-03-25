@@ -4,14 +4,53 @@
 #include <map>
 #include <vector>
 
-typedef std::tuple<size_t, size_t> Point;
-typedef std::map<Point, char> Board;
+typedef struct ActionInfo {
+	int dx;
+	int dy;
+	char moveChar;
+	char pullChar;
+} ActionInfo;
 
-enum Field
-{
-    wall = '#', box = '0', target = '*', worker = '-', newline = '\n', empty = ' '
-};
+#define MOVE_UP    ActionInfo{0, -1, 'u', 'U'}
+#define MOVE_RIGHT  ActionInfo{1, 0,  'r', 'R'}
+#define MOVE_DOWN ActionInfo{0, 1,  'd', 'D'}
+#define MOVE_LEFT ActionInfo{0, -1, 'l', 'L'}
+
+#define WALL '#'
+#define BOX '0'
+#define TARGET '*'
+#define WORKER '-'
+#define NEWLINE '\n'
+#define EMPTY_SPACE ' '
+
+typedef struct Point {
+	size_t x;
+	size_t y;
+
+	bool operator<(const Point &other) const {
+		return std::tie(x, y) < std::tie(other.x, other.y);
+	};
+
+	bool operator==(const Point &other) const {
+		return x == other.x && y == other.y;
+	};
+} Point;
+
+typedef std::vector<std::vector<char>> Board;
+
+typedef struct BoardState {
+	Board board;
+	Point workerPos;
+	std::string history;
+} BoardState;
+
 
 bool isSolved(Board &, std::vector<Point> &);
+
+Board &readBoard(size_t &w, size_t &h, Board &b, std::istream &in, Point &workerPos, std::vector<Point> &locations);
+
+bool isPointInBoardRange(size_t height, size_t width, Point &point);
+
+bool pull(size_t x, size_t y, int dx, int dy, Board &board);
 
 #endif //SOKOBAN_SOKOBANLIB_H
