@@ -1,2 +1,2 @@
 add_executable(sokobanlib_tests TestsMain.cpp SokobanlibTests.cpp)
-target_link_libraries(sokobanlib_tests unit_tests sokobanlib)
+target_link_libraries(sokobanlib_tests catch sokobanlib)

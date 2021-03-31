@@ -39,4 +39,6 @@ cmake-build-debug/
 main
 
 cmake-build/
-bin/
+
+sokoban/bin/
+sokobanlib/lib/

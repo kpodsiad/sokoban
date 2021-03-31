@@ -6,6 +6,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 project(${TARGET})
 
 # add shared libraries here
-add_subdirectory(test_libs)
+add_subdirectory(catch)
 add_subdirectory(sokobanlib)
 add_subdirectory(sokoban)
