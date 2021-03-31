@@ -12,9 +12,9 @@ typedef struct ActionInfo {
 } ActionInfo;
 
 #define MOVE_UP    ActionInfo{0, -1, 'u', 'U'}
-#define MOVE_RIGHT  ActionInfo{1, 0,  'r', 'R'}
 #define MOVE_DOWN ActionInfo{0, 1,  'd', 'D'}
-#define MOVE_LEFT ActionInfo{0, -1, 'l', 'L'}
+#define MOVE_RIGHT  ActionInfo{1, 0,  'r', 'R'}
+#define MOVE_LEFT ActionInfo{-1, 0, 'l', 'L'}
 
 #define WALL '#'
 #define BOX '0'
@@ -49,7 +49,11 @@ bool isSolved(Board &, std::vector<Point> &);
 
 Board &readBoard(size_t &w, size_t &h, Board &b, std::istream &in, Point &workerPos, std::vector<Point> &locations);
 
-bool isPointInBoardRange(size_t height, size_t width, Point &point);
+bool isPointInBoardRange(size_t height, size_t width, long x, long y);
+
+bool canMoveInDirection(size_t x, size_t y, int dx, int dy, Board &board);
+
+void move(size_t x, size_t y, int dx, int dy, Board &board);
 
 bool pull(size_t x, size_t y, int dx, int dy, Board &board);
 

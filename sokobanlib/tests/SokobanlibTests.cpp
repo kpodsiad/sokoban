@@ -63,24 +63,19 @@ TEST_CASE("readBoard reads board as a string input", "[sokobanlib]") {
 }
 
 TEST_CASE("isPointInBoardRange should return true for points within board range", "[sokobanlib]") {
-	Point p1 = {2, 2};
-	CHECK(isPointInBoardRange(3, 3, p1));
-	Point p2 = {0, 0};
-	CHECK(isPointInBoardRange(3, 3, p2));
-	Point p3 = {1, 2};
-	CHECK(isPointInBoardRange(3, 3, p3));
+	CHECK(isPointInBoardRange(3, 3, 2, 2));
+	CHECK(isPointInBoardRange(3, 3, 0, 0));
+	CHECK(isPointInBoardRange(3, 3, 1, 2));
 }
 
 TEST_CASE("isPointInBoardRange should return false for points not in board range", "[sokobanlib]") {
-	Point p1 = {0, 3};
-	CHECK_FALSE(isPointInBoardRange(3, 3, p1));
-	Point p2 = {3, 0};
-	CHECK_FALSE(isPointInBoardRange(3, 3, p2));
-	Point p3 = {2, 4};
-	CHECK_FALSE(isPointInBoardRange(3, 3, p3));
+	CHECK_FALSE(isPointInBoardRange(3, 3, 0, 3));
+	CHECK_FALSE(isPointInBoardRange(3, 3, 3, 0));
+	CHECK_FALSE(isPointInBoardRange(3, 3, 2, 4));
+	CHECK_FALSE(isPointInBoardRange(3, 3, -1, 2));
 }
 
-TEST_CASE("pull should return false when pulling is not possible", "[sokobanlib]") {
+TEST_CASE("can move should return false when pulling is not possible", "[sokobanlib]") {
 	std::stringstream ss;
 	ss << "3 3" << std::endl;
 	ss << "#0#" << std::endl;
@@ -91,10 +86,10 @@ TEST_CASE("pull should return false when pulling is not possible", "[sokobanlib]
 	Point workerPos;
 	std::vector<Point> locations;
 	readBoard(width, height, board, ss, workerPos, locations);
-	CHECK_FALSE(pull(1, 1, MOVE_UP.dx, MOVE_UP.dy, board));
-	CHECK_FALSE(pull(1, 1, MOVE_RIGHT.dx, MOVE_RIGHT.dy, board));
-	CHECK_FALSE(pull(1, 1, MOVE_DOWN.dx, MOVE_DOWN.dy, board));
-	CHECK_FALSE(pull(1, 1, MOVE_LEFT.dx, MOVE_LEFT.dy, board));
+	CHECK_FALSE(canMoveInDirection(1, 1, MOVE_UP.dx, MOVE_UP.dy, board));
+	CHECK_FALSE(canMoveInDirection(1, 1, MOVE_UP.dx, MOVE_UP.dy, board));
+	CHECK_FALSE(canMoveInDirection(1, 1, MOVE_UP.dx, MOVE_UP.dy, board));
+	CHECK_FALSE(canMoveInDirection(1, 1, MOVE_UP.dx, MOVE_UP.dy, board));
 }
 
 Board &getBoard(Board &board, std::istream &in) {
@@ -122,7 +117,7 @@ TEST_CASE("pull should return true and modify board when pulling right is possib
 	std::stringstream ss;
 	ss << "3 3" << std::endl;
 	ss << "#0#" << std::endl;
-	ss << "0- " << std::endl;
+	ss << "0-*" << std::endl;
 	ss << "#0#" << std::endl;
 	Board board;
 	getBoard(board, ss);
@@ -148,12 +143,25 @@ TEST_CASE("pull should return true and modify board when pulling left is possibl
 	std::stringstream ss;
 	ss << "3 3" << std::endl;
 	ss << "# #" << std::endl;
-	ss << "0-0" << std::endl;
+	ss << "*-0" << std::endl;
 	ss << "#0#" << std::endl;
 	Board board;
 	getBoard(board, ss);
 	CHECK(pull(1, 1, MOVE_LEFT.dx, MOVE_LEFT.dy, board));
-	CHECK(board[1][0] == WORKER);
+	CHECK(board[0][1] == WORKER);
 	CHECK(board[1][1] == BOX);
+}
+
+TEST_CASE("move should change worker position", "[sokobanlib]") {
+	std::stringstream ss;
+	ss << "3 3" << std::endl;
+	ss << "# #" << std::endl;
+	ss << "*- " << std::endl;
+	ss << "#0#" << std::endl;
+	Board board;
+	getBoard(board, ss);
+	move(1, 1, MOVE_LEFT.dx, MOVE_LEFT.dy, board);
+	CHECK(board[0][1] == WORKER);
+	CHECK(board[1][1] == EMPTY_SPACE);
 }
 

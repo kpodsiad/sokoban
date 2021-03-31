@@ -45,16 +45,28 @@ Board &readBoard(size_t &width, size_t &height, Board &board, std::istream &in, 
 	return board;
 }
 
-bool isPointInBoardRange(size_t height, size_t width, Point &point) {
-	return point.x >= 0 && point.x < width && point.y >= 0 && point.y < height;
+bool isPointInBoardRange(size_t height, size_t width, long x, long y) {
+	return x >= 0 && x < width && y >= 0 && y < height;
+}
+
+bool canMoveInDirection(size_t x, size_t y, int dx, int dy, Board &board) {
+	auto workerNext = board[x + dx][y + dy];
+	if (workerNext != EMPTY_SPACE && workerNext != TARGET) {
+		return false;
+	}
+	return true;
+}
+
+void move(size_t x, size_t y, int dx, int dy, Board &board) {
+	board[x + dx][y + dy] = WORKER;
+	board[x][y] = EMPTY_SPACE;
 }
 
 bool pull(size_t x, size_t y, int dx, int dy, Board &board) {
-	auto maybeBox = board[x - dx][y - dy];
-	auto workerNext = board[x + dx][y + dy];
-	if (maybeBox == EMPTY_SPACE || (workerNext != EMPTY_SPACE && workerNext != TARGET)) {
+	auto boxInRange = isPointInBoardRange(board.size(), board[0].size(), x - dx, y - dy);
+	if (!boxInRange || board[x - dx][y - dy] != BOX)
 		return false;
-	}
+	
 	board[x + dx][y + dy] = WORKER;
 	board[x][y] = BOX;
 	board[x - dx][y - dy] = EMPTY_SPACE;
