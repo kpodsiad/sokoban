@@ -17,7 +17,7 @@ typedef struct ActionInfo {
 #define MOVE_LEFT ActionInfo{-1, 0, 'l', 'L'}
 
 #define WALL '#'
-#define BOX '0'
+#define BOX 'O'
 #define TARGET '*'
 #define WORKER '-'
 #define NEWLINE '\n'
@@ -40,21 +40,26 @@ typedef std::vector<std::vector<char>> Board;
 
 typedef struct BoardState {
 	Board board;
-	Point workerPos;
-	std::string history;
+	size_t workerPosX;
+	size_t workerPosY;
+	std::string path;
 } BoardState;
+
+typedef std::map<Point, char> Positions;
 
 
 bool isSolved(Board &, std::vector<Point> &);
 
-Board &readBoard(size_t &w, size_t &h, Board &b, std::istream &in, Point &workerPos, std::vector<Point> &locations);
+void readBoard(size_t &w, size_t &h, Board &b, std::istream &in, Point &workerPos, std::vector<Point> &locations);
 
 bool isPointInBoardRange(size_t height, size_t width, long x, long y);
 
-bool canMoveInDirection(size_t x, size_t y, int dx, int dy, Board &board);
+bool couldMoveInDirection(size_t x, size_t y, int dx, int dy, Board &board);
 
 void move(size_t x, size_t y, int dx, int dy, Board &board);
 
-bool pull(size_t x, size_t y, int dx, int dy, Board &board);
+bool pullBoxIfItIsPossible(size_t x, size_t y, int dx, int dy, Board &board);
+
+void getPositionsFromBoard(Board &board, Positions &positions);
 
 #endif //SOKOBAN_SOKOBANLIB_H

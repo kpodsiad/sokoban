@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <queue>
+#include <set>
 #include <sokobanlib.h>
 
 using namespace std;
@@ -10,42 +11,56 @@ int main() {
 	Board startingBoard;
 	Point workerPosition;
 	queue<BoardState> states;
-	vector<Point> locations;
-
-	readBoard(width, height, startingBoard, cin, workerPosition, locations);
+	vector<Point> targetLocations;
+	set<string> previousPaths;
+	set<Positions> previousPositions;
 	vector<ActionInfo> actions = {MOVE_UP, MOVE_RIGHT, MOVE_DOWN, MOVE_LEFT};
 
-	states.push({startingBoard, workerPosition, ""});
-	int i =0;
+	readBoard(width, height, startingBoard, cin, workerPosition, targetLocations);
+
+	states.push({startingBoard, workerPosition.x, workerPosition.y, ""});
 	while (!states.empty()) {
 		auto state = states.front();
-		Point workerPos = state.workerPos;
+		states.pop();
 		Board board = state.board;
 
-		if (isSolved(board, locations)) {
-			cout << state.history;
+		if (isSolved(board, targetLocations)) {
+			cout << state.path;
 			break;
 		}
 
-		for (auto &action: actions) {
-			size_t x = workerPos.x; size_t y = workerPos.y; int dx = action.dx; int dy = action.dy;
+		if (previousPaths.find(state.path) != previousPaths.end()) {
+			continue;
+		}
 
-			if (isPointInBoardRange(height, width, x + dx, y + dy) && canMoveInDirection(x, y, dx, dy, board)) {
-				Point newPos = {x + dx, y + dy};
-				// if box is adjacent to worker maybe he can pull it?
-				if (pull(x, y, dx, dy, board) /* todo add board history */) {
-					states.push({board, newPos, state.history + action.pullChar});
-				} else  {
+		map<Point, char> currentPositions;
+		getPositionsFromBoard(board, currentPositions);
+		if (previousPositions.find(currentPositions) != previousPositions.end()) {
+			continue;
+		}
+
+		previousPaths.insert(state.path);
+		previousPositions.insert(currentPositions);
+
+		for (auto &action: actions) {
+			size_t x = state.workerPosX, y = state.workerPosY;
+			int dx = action.dx, dy = action.dy;
+
+			if (isPointInBoardRange(height, width, x + dx, y + dy) && couldMoveInDirection(x, y, dx, dy, board)) {
+				char actionLetter;
+				// if box is adjacent to worker maybe he can pullBoxIfItIsPossible it?
+				if (pullBoxIfItIsPossible(x, y, dx, dy, board)) {
+					actionLetter = action.pullChar;
+				} else {
 					move(x, y, dx, dy, board);
-					states.push({board, newPos, state.history + action.moveChar});
+					actionLetter = action.moveChar;
 				}
+
+				states.push({board, x + dx, y + dy, state.path + actionLetter});
 				// back to default state
 				board = state.board;
 			}
 		}
-
-		states.pop();
-		++i;
 	}
 
 	return 0;

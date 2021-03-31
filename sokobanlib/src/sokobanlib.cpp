@@ -1,8 +1,8 @@
 #include <sokobanlib.h>
 #include <iostream>
 
-bool isSolved(Board &board, std::vector<Point> &locations) {
-	for (auto &it : locations) {
+bool isSolved(Board &board, std::vector<Point> &targetLocations) {
+	for (auto &it : targetLocations) {
 		auto found = board[it.x][it.y];
 		if (found  != BOX) {
 			return false;
@@ -11,7 +11,7 @@ bool isSolved(Board &board, std::vector<Point> &locations) {
 	return true;
 }
 
-Board &readBoard(size_t &width, size_t &height, Board &board, std::istream &in, Point &workerPosition,
+void readBoard(size_t &width, size_t &height, Board &board, std::istream &in, Point &workerPosition,
                  std::vector<Point> &locations) {
 	char c;
 	size_t x = 0, y = -1, read = 0;
@@ -30,6 +30,7 @@ Board &readBoard(size_t &width, size_t &height, Board &board, std::istream &in, 
 				workerPosition = {x, y};
 			}
 			if (c == TARGET) {
+				board[x][y] = EMPTY_SPACE;
 				locations.push_back({x, y});
 			}
 		}
@@ -42,16 +43,15 @@ Board &readBoard(size_t &width, size_t &height, Board &board, std::istream &in, 
 		}
 	}
 	in.setf(flags);
-	return board;
 }
 
 bool isPointInBoardRange(size_t height, size_t width, long x, long y) {
 	return x >= 0 && x < width && y >= 0 && y < height;
 }
 
-bool canMoveInDirection(size_t x, size_t y, int dx, int dy, Board &board) {
+bool couldMoveInDirection(size_t x, size_t y, int dx, int dy, Board &board) {
 	auto workerNext = board[x + dx][y + dy];
-	if (workerNext != EMPTY_SPACE && workerNext != TARGET) {
+	if (workerNext != EMPTY_SPACE) {
 		return false;
 	}
 	return true;
@@ -62,7 +62,7 @@ void move(size_t x, size_t y, int dx, int dy, Board &board) {
 	board[x][y] = EMPTY_SPACE;
 }
 
-bool pull(size_t x, size_t y, int dx, int dy, Board &board) {
+bool pullBoxIfItIsPossible(size_t x, size_t y, int dx, int dy, Board &board) {
 	auto boxInRange = isPointInBoardRange(board.size(), board[0].size(), x - dx, y - dy);
 	if (!boxInRange || board[x - dx][y - dy] != BOX)
 		return false;
@@ -71,4 +71,17 @@ bool pull(size_t x, size_t y, int dx, int dy, Board &board) {
 	board[x][y] = BOX;
 	board[x - dx][y - dy] = EMPTY_SPACE;
 	return true;
+}
+
+void getPositionsFromBoard(Board &board, Positions &positions) {
+	size_t x = 0;
+	for(auto &it : board) {
+		size_t y = 0;
+		for(auto &elem: it) {
+			if (elem == WORKER || elem == BOX)
+				positions[{x,y}] = elem;
+			++y;
+		}
+		++x;
+	}
 }
