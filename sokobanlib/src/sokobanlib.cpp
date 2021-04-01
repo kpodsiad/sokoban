@@ -16,8 +16,8 @@ void readBoard(size_t &width, size_t &height, Board &board, std::istream &in, Po
 	char c;
 	size_t x = 0, y = -1, read = 0;
 	in >> height >> width;
-	for(int i=0; i<height; ++i) {
-		std::vector<char> v(width, EMPTY_SPACE);
+	for(int i=0; i<width; ++i) {
+		std::vector<char> v(height, EMPTY_SPACE);
 		board.push_back(v);
 	}
 	auto flags = in.flags();

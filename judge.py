@@ -140,7 +140,7 @@ def check(t,s,view=True):
 
     r,c = r1,c1
 
-    if view: sleep(0.1)
+    if view: sleep(0.15)
   end
 
   for r,c in pola:

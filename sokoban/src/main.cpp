@@ -3,6 +3,7 @@
 #include <queue>
 #include <set>
 #include <sokobanlib.h>
+#include <chrono>
 
 using namespace std;
 
@@ -12,34 +13,28 @@ int main() {
 	Point workerPosition;
 	queue<BoardState> states;
 	vector<Point> targetLocations;
-	set<string> previousPaths;
 	set<Positions> previousPositions;
 	vector<ActionInfo> actions = {MOVE_UP, MOVE_RIGHT, MOVE_DOWN, MOVE_LEFT};
 
 	readBoard(width, height, startingBoard, cin, workerPosition, targetLocations);
 
 	states.push({startingBoard, workerPosition.x, workerPosition.y, ""});
+	size_t iteration = 0;
+	auto start = chrono::steady_clock::now();
 	while (!states.empty()) {
 		auto state = states.front();
 		states.pop();
 		Board board = state.board;
 
 		if (isSolved(board, targetLocations)) {
-			cout << state.path;
+			cout << state.path << endl;
 			break;
-		}
-
-		if (previousPaths.find(state.path) != previousPaths.end()) {
-			continue;
 		}
 
 		map<Point, char> currentPositions;
 		getPositionsFromBoard(board, currentPositions);
-		if (previousPositions.find(currentPositions) != previousPositions.end()) {
+		if (previousPositions.find(currentPositions) != previousPositions.end())
 			continue;
-		}
-
-		previousPaths.insert(state.path);
 		previousPositions.insert(currentPositions);
 
 		for (auto &action: actions) {
@@ -61,7 +56,12 @@ int main() {
 				board = state.board;
 			}
 		}
+		++iteration;
 	}
+
+	auto diff = chrono::steady_clock::now() - start;
+	cout << "Iterations: " << iteration << endl;
+	cout << chrono::duration <double, milli> (diff).count() << " ms" << endl;
 
 	return 0;
 }
