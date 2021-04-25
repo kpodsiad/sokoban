@@ -3,6 +3,8 @@
 
 #include <map>
 #include <vector>
+#include <unordered_set>
+#include <sstream>
 
 typedef struct ActionInfo {
 	int dx;
@@ -34,32 +36,48 @@ typedef struct Point {
 	inline bool operator==(const Point &other) const {
 		return x == other.x && y == other.y;
 	};
+
+	std::string toString() const {
+		std::stringstream ss;
+		ss << "(" << this->x << ", " << this->y << ")";
+		return ss.str();
+	}
 } Point;
 
-typedef std::vector<std::vector<char>> Board;
+namespace std
+{
+	template<>
+	struct hash<Point>
+	{
+		size_t operator()(const Point & point) const {
+			return ((uint64_t)point.x << 32) | point.y;
+		}
+	};
+}
 
-typedef struct BoardState {
-	Board board;
-	size_t workerPosX;
-	size_t workerPosY;
-	std::string path;
-} BoardState;
+typedef std::unordered_set<Point> Points;
 
-typedef std::map<Point, char> Positions;
+typedef struct Board {
+	size_t width;
+	size_t height;
+	Points walls;
+	Point worker;
+	Point box;
+	Point target;
+} Board;
 
 
-bool isSolved(Board &, std::vector<Point> &);
+void readBoard(Board &board, std::istream &in);
 
-void readBoard(size_t &w, size_t &h, Board &b, std::istream &in, Point &workerPos, std::vector<Point> &locations);
+std::string findPathToTheBox(Board &board);
 
 bool isPointInBoardRange(size_t height, size_t width, long x, long y);
 
-bool couldMoveInDirection(size_t x, size_t y, int dx, int dy, Board &board);
+bool couldMoveInDirection(size_t x, size_t y, int dx, int dy, Points &board);
 
-void move(size_t x, size_t y, int dx, int dy, Board &board);
+void move(size_t x, size_t y, int dx, int dy, Points &board);
 
-bool pullBoxIfItIsPossible(size_t x, size_t y, int dx, int dy, Board &board);
+bool pullBoxIfItIsPossible(size_t x, size_t y, int dx, int dy, Points &board);
 
-void getPositionsFromBoard(Board &board, Positions &positions);
 
 #endif //SOKOBAN_SOKOBANLIB_H
