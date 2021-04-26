@@ -5,6 +5,16 @@
 #include <vector>
 #include <unordered_set>
 #include <sstream>
+#include <stack>
+#include <deque>
+#include <set>
+#include <queue>
+#include <set>
+#include <cstdlib>
+#include <iostream>
+#include <array>
+#include <functional>
+#include <algorithm>
 
 typedef struct ActionInfo {
 	int dx;
@@ -26,8 +36,8 @@ typedef struct ActionInfo {
 #define EMPTY_SPACE ' '
 
 typedef struct Point {
-	size_t x;
-	size_t y;
+	int x;
+	int y;
 
 	bool operator<(const Point &other) const {
 		return std::tie(x, y) < std::tie(other.x, other.y);
@@ -37,6 +47,12 @@ typedef struct Point {
 		return x == other.x && y == other.y;
 	};
 
+	inline size_t dist(Point &other) const {
+		size_t dx = abs(x - other.x);
+		size_t dy = abs(y - other.y);
+		return dx + dy;
+	};
+
 	std::string toString() const {
 		std::stringstream ss;
 		ss << "(" << this->x << ", " << this->y << ")";
@@ -44,13 +60,11 @@ typedef struct Point {
 	}
 } Point;
 
-namespace std
-{
+namespace std {
 	template<>
-	struct hash<Point>
-	{
-		size_t operator()(const Point & point) const {
-			return ((uint64_t)point.x << 32) | point.y;
+	struct hash<Point> {
+		long operator()(const Point &point) const {
+			return ((long) point.x << 32) | point.y;
 		}
 	};
 }
@@ -58,8 +72,8 @@ namespace std
 typedef std::unordered_set<Point> Points;
 
 typedef struct Board {
-	size_t width;
-	size_t height;
+	int width;
+	int height;
 	Points walls;
 	Point worker;
 	Point box;
@@ -69,15 +83,8 @@ typedef struct Board {
 
 void readBoard(Board &board, std::istream &in);
 
-std::string findPathToTheBox(Board &board);
+std::deque<char> findPathToTheBox(Board &board);
 
-bool isPointInBoardRange(size_t height, size_t width, long x, long y);
-
-bool couldMoveInDirection(size_t x, size_t y, int dx, int dy, Points &board);
-
-void move(size_t x, size_t y, int dx, int dy, Points &board);
-
-bool pullBoxIfItIsPossible(size_t x, size_t y, int dx, int dy, Points &board);
-
+std::deque<char> findPathFromTheBoxToTheTarget(Board &board);
 
 #endif //SOKOBAN_SOKOBANLIB_H
