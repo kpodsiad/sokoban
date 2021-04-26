@@ -123,7 +123,8 @@ bool boxDfs(Board &board, std::deque<char> &stack, std::set<Point> &visited, Poi
 	sort(actions.begin(), actions.end(),
 	     [](std::tuple<size_t, ActionInfo> a, std::tuple<size_t, ActionInfo> b) {
 		     return std::get<0>(a) < std::get<0>(b);
-	     });
+	     }
+	);
 	char lastMove = 'E';
 	if (!stack.empty()) {
 		lastMove = stack.back();
@@ -160,16 +161,18 @@ bool boxDfs(Board &board, std::deque<char> &stack, std::set<Point> &visited, Poi
 				return true;
 			} else if (!stack.empty()) {
 				auto elem = stack.back();
-				while (elem == MOVE_UP.moveChar || elem == MOVE_RIGHT.moveChar || elem == MOVE_DOWN.moveChar || elem == MOVE_LEFT.moveChar) {
+				while (elem == MOVE_UP.moveChar || elem == MOVE_RIGHT.moveChar || elem == MOVE_DOWN.moveChar ||
+				       elem == MOVE_LEFT.moveChar) {
 					stack.pop_back();
 					elem = stack.back();
 				}
-				if(!stack.empty()) {
+				if (!stack.empty()) {
 					stack.pop_back();
 				}
-				if(!stack.empty()) {
+				if (!stack.empty()) {
 					elem = stack.back();
-					while (elem == MOVE_UP.moveChar || elem == MOVE_RIGHT.moveChar || elem == MOVE_DOWN.moveChar || elem == MOVE_LEFT.moveChar) {
+					while (elem == MOVE_UP.moveChar || elem == MOVE_RIGHT.moveChar || elem == MOVE_DOWN.moveChar ||
+					       elem == MOVE_LEFT.moveChar) {
 						stack.pop_back();
 						elem = stack.back();
 					}
