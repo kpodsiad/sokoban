@@ -7,22 +7,21 @@ using namespace std;
 
 int main() {
 	Board board;
-	readBoard(board, cin);
+	Points boxes;
+	Points targets;
+	Point worker;
+	readBoard(board, boxes, targets, worker, cin);
 	auto start = chrono::steady_clock::now();
 
-	auto boxToTheTarget = findPathFromTheBoxToTheTarget(board);
-	auto workerToTheBox = findPathToTheBox(board);
+	auto path = solveProblem(board, boxes, targets, worker);
 
 	auto diff = chrono::steady_clock::now() - start;
 
-	for (const auto &elem: workerToTheBox) {
+	for (const auto &elem: path) {
 		cout << elem;
 	}
-	for (const auto &elem: boxToTheTarget) {
-		cout << elem;
-	}
-	cout << endl;
 
+	cout << endl;
 	cout << chrono::duration<double, milli>(diff).count() << " ms" << endl;
 	return 0;
 }

@@ -39,7 +39,7 @@ typedef struct Point {
 	int x;
 	int y;
 
-	bool operator<(const Point &other) const {
+	inline bool operator<(const Point &other) const {
 		return std::tie(x, y) < std::tie(other.x, other.y);
 	};
 
@@ -47,7 +47,7 @@ typedef struct Point {
 		return x == other.x && y == other.y;
 	};
 
-	inline size_t dist(Point &other) const {
+	inline size_t dist(Point &other) {
 		size_t dx = abs(x - other.x);
 		size_t dy = abs(y - other.y);
 		return dx + dy;
@@ -75,16 +75,15 @@ typedef struct Board {
 	int width;
 	int height;
 	Points walls;
-	Point worker;
-	Point box;
-	Point target;
 } Board;
 
 
-void readBoard(Board &board, std::istream &in);
+void readBoard(Board &board, Points &boxes, Points &targets, Point &worker, std::istream &in);
 
-std::deque<char> findPathToTheBox(Board &board);
+std::tuple<std::deque<char>, bool> findPathToTheBox(Board &board, Point &worker, Point &target);
 
-std::deque<char> findPathFromTheBoxToTheTarget(Board &board);
+std::deque<char> findPathFromTheBoxToTheTarget(Board &board, Point &box, Point &target);
+
+std::deque<char> solveProblem(Board &board, Points boxes, Points targets, Point worker);
 
 #endif //SOKOBAN_SOKOBANLIB_H
